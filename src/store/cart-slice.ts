@@ -1,5 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+export interface CartState {
+  items: CartItemModel[];
+  totalQuantity: number;
+  changed: boolean;
+}
+
 export interface CartItemModel {
   itemId: string;
   price: number;
@@ -17,8 +23,12 @@ export interface ItemModel {
 
 const cartSlice = createSlice({
   name: "cart",
-  initialState: { items: [] as CartItemModel[], totalQuantity: 0 },
+  initialState: { items: [], totalQuantity: 0, changed: false } as CartState,
   reducers: {
+    replaceCart(state, action) {
+      state.totalQuantity = action.payload.totalQuantity;
+      state.items = action.payload.items;
+    },
     addItemToCart(state, action) {
       const item = action.payload as ItemModel;
       const existingItem = state.items.find((i) => i.itemId === item.id);
@@ -36,6 +46,7 @@ const cartSlice = createSlice({
         existingItem.totalPrice += item.price;
       }
       state.totalQuantity++;
+      state.changed = true;
     },
     removeItemFromCart(state, action) {
       const id = action.payload as string;
@@ -49,6 +60,7 @@ const cartSlice = createSlice({
         }
       }
       state.totalQuantity--;
+      state.changed = true;
     },
   },
 });
